@@ -1,3 +1,155 @@
+# How to Acquire Data using Linux (Offline)
+
+## LAB 2
+
+# Scenario
+
+In this **offline** exercise, we will go through the process of preparing our evidence storage environment, and collecting the most important data from an offline (dead-box) hard disk drive in order to use it later on for analysis and investigations.
+
+The scope of this lab is using a Linux operating system (<u>that you will set up locally</u>) to perform image acquisition of a hard disk drive.
+
+# Goals
+
+-   Prepare an evidence storage environment
+
+-   Use Linux to prepare forensic images
+
+-   Hash files and drives for validation
+
+-   Bonus: copy forensic images to CD/DVDs
+
+# What you will learn
+
+-   How to prepare the evidence storage (target) environment to store evidence
+
+-   How to organize your evidence storage
+
+-   How to use different Linux tools to create forensic images
+
+-   How to hash files and drives and why
+
+-   How to compress and split forensic images to be stored on CD/DVD drives
+
+To guide you throughout the lab process, you will find different Tasks. Tasks are designed for educational purposes, as well as to show you the usage of different tools and different methods to achieve the same goal. Please note that Tasks are not meant to be used as a methodology.
+
+Armed with the knowledge acquired from the content and the skills acquired from the Task(s), you can achieve the Lab goal. If this is the first time doing a lab, we advise that you follow these Tasks.
+
+Once you have completed all Tasks, you can proceed to the end of the lab manual and check the solutions.
+
+# Recommended tools
+
+-   **Virtualbox**
+
+-   **Linux operating system with dd**
+
+-   **Different Linux CLI Commands**
+
+-   **The dcfldd tool**
+
+# Setting up the environment
+
+-   The tasks below assume you are using a Linux Operating System (Kali, SIFT, Ubuntu, etc.) locally. Please download the appropriate ISO to create such a Virtual Machine on your personal computer. We will be using Virtualbox.
+
+-   In order to complete task 5, you need to install the dcfldd tool, which can be done on a Linux Debian/Ubuntu flavor like this:
+
+```bash
+sudo apt-get install dcfldd
+```
+
+-   This lab assumes you are going to image a previously connected hard disk drive. In a real-life scenario, you will be plugging this drive yourself; you will not find it already plugged in for you.
+
+-   In a real-life scenario, it would be better to perform hard disk drive imaging using a write-blocker, to make sure you will not mistakenly damage your evidence.
+
+    
+    
+    **Instructions to configure your Virtual Machine for this lab:**
+
+We need two extra drives that will be used as follows:
+
+I.  Drive A: this will be used to simulate the storage location used for evidence that we acquire, which is supposed to be big enough. I recommend making this around 100GB. Make it even bigger if you can, so you won't be facing disk space issues later on when you're working with different cases.
+
+II. Drive B: this will be used to simulate the suspect's drive (or USB drive). I highly recommend you make this no less than 8GB. There are a couple of files that could be added to this drive if you want to simulate having a file on it, or you can just add your own later.
+
+After you have installed or imported your Linux OS, all you need to do is:
+
+1.  From Virtualbox, go to the virtual machine you prepared and click on Settings.
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp1.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image3.png)
+
+2.  After clicking on the Settings button, you will get to the following window:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp2.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image4.png)
+
+3.  Go to the Storage tab, which leads you to this:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp3.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image5.png)
+
+4.  Now please be focused what you're going to do next, as this is an important step in your configurations. I highly recommend you click on the Controller saying "**SATA**," just like the figure below, and then click on the blue icon with a green plus in the middle of it:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp5.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image6.png)
+
+5.  You may be wondering what will happen if you don't click on Controller: SATA. If you do not, you will need to adjust the whole document to be using "/dev/hdb" instead of "/dev/sdb" and using     "/dev/hdd" instead of "/dev/sdd." The reason behind that, is PATA drives use the hdx naming convention, while SATA drives follow the sdx naming convention, where x is any character starting from a. This is all you need to know here, you can check any Linux administration book for more details if you want.
+
+6.  Now, after you press that button, a drop-down menu will appear, just like in the figure below:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp6.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image7.png)
+
+7.  Click on the "**Add Hard Disk**" menu to proceed.
+
+8.  You will reach a window asking if you want to add an existing drive to the system or you want to create a new disk. Please make sure you chose "**Create new disk**," unless you already have a disk and you     just want to add it to the system.
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp7.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image8.png)
+
+9.  The next window will ask you about the hard disk type. Actually, I'm not interested in a specific type, so just chose the default one **VDI (VirtualBox Disk Image)** and proceed:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp8.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image9.png)
+
+10. On the next window, I recommend you leave the default; this has some pros and cons. The good thing is that it won't reserve all the space that we talked about straight away, but it will be dynamically     growing. If we chose the second option, it will statically reserve all the Gigabytes that we specified for this disk. So, I will go with **Dynamically Allocated** and proceed:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp9.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image10.png)
+
+11. Now you need to specify the name you want for the evidence storage drive, I have named it "**EvidenceStorage**," but you can name it whatever you want, just make sure you remember your naming conventions later.
+
+    12. Also, you need to specify the drive size. Since we are preparing Drive A, this will be our Evidence Storage container, and it will have **100GB** in size. When done, click on the **Create** button to proceed.
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp10.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image11.png)
+
+13. Please proceed to create the Suspect's drive that will be used for testing.
+
+14. Now, repeat the same process for Drive B, and when you reach the page that you saw in the previous figure, make sure you do the following:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp11.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image12.png)
+
+15. When you are sure of your settings, click the **Create** button to proceed.
+
+16. You should get something like the following:
+
+![C:\\Users\\Binary\\Desktop\\AddStorage\\dfp12.png](https://assets.ine.com/cybersecurity-lab-images/2f4526bd-180f-421c-8b42-9810bf0cfb1a/image13.png)
+
+17. Now start your Linux system and log into it.
+
+18. The result is that we have the following:
+
+-   **EvidenceStorage** drive is now found under **/dev/sdb**
+
+-   **SuspectDrive** is now found under **/dev/sdd**
+
+19. BTW, you can also validate your work using:
+
+**#dmesg | grep sd**
+
+20. In the output, you should find something saying that sdb is 100GB (or whatever size you chose) and sdd is 8GB (or whatever size you chose).
+
+21. Or maybe:
+
+**# sudo fdisk -l /dev/sdb**
+
+**# sudo fdisk -l /dev/sdd**
+
+22. You need to remember this carefully so you could easily work the lab. If you make any changes, then you will need to adapt to fit your needs.
+
+23. Now, you can start working on the lab.
+
 # Tasks
 
 ## Task 1: Preparing the Evidence Drive (Target)
