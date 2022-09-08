@@ -2,50 +2,6 @@
 
 ## LAB 2
 
-# Scenario
-
-In this **offline** exercise, we will go through the process of preparing our evidence storage environment, and collecting the most important data from an offline (dead-box) hard disk drive in order to use it later on for analysis and investigations.
-
-The scope of this lab is using a Linux operating system (<u>that you will set up locally</u>) to perform image acquisition of a hard disk drive.
-
-# Goals
-
--   Prepare an evidence storage environment
-
--   Use Linux to prepare forensic images
-
--   Hash files and drives for validation
-
--   Bonus: copy forensic images to CD/DVDs
-
-# What you will learn
-
--   How to prepare the evidence storage (target) environment to store evidence
-
--   How to organize your evidence storage
-
--   How to use different Linux tools to create forensic images
-
--   How to hash files and drives and why
-
--   How to compress and split forensic images to be stored on CD/DVD drives
-
-To guide you throughout the lab process, you will find different Tasks. Tasks are designed for educational purposes, as well as to show you the usage of different tools and different methods to achieve the same goal. Please note that Tasks are not meant to be used as a methodology.
-
-Armed with the knowledge acquired from the content and the skills acquired from the Task(s), you can achieve the Lab goal. If this is the first time doing a lab, we advise that you follow these Tasks.
-
-Once you have completed all Tasks, you can proceed to the end of the lab manual and check the solutions.
-
-# Recommended tools
-
--   **Virtualbox**
-
--   **Linux operating system with dd**
-
--   **Different Linux CLI Commands**
-
--   **The dcfldd tool**
-
 # Setting up the environment
 
 -   The tasks below assume you are using a Linux Operating System (Kali, SIFT, Ubuntu, etc.) locally. Please download the appropriate ISO to create such a Virtual Machine on your personal computer. We will be using Virtualbox.
